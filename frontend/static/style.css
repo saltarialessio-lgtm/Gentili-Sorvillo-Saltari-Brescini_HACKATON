@@ -1,0 +1,266 @@
+/* Layout generale */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e6e6e6;
+  background: url("sfondo.jpg") center/cover fixed no-repeat;
+}
+
+/* Overlay scuro per aumentare il contrasto */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(255, 166, 0, 0.18), transparent 55%),
+              radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.08), transparent 55%),
+              rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Contenitore centrale tipo “card” */
+.container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 32px 40px;
+  background: rgba(10, 10, 10, 0.75);
+  border-radius: 18px;
+  box-shadow: 0 26px 50px rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 153, 0, 0.25);
+  text-align: center;
+}
+
+/* Titoli e testi */
+h1, h2, h3 {
+  margin-top: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 2.4rem;
+  color: #ffd27a;
+  text-shadow: 0 0 18px rgba(255, 200, 120, 0.5);
+}
+
+h2 {
+  font-size: 1.4rem;
+  color: #f0f0f0;
+}
+
+p {
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+/* Pulsanti stile “crypto dashboard” */
+.btn-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+button,
+.btn {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 166, 0, 0.6);
+  background: linear-gradient(135deg, #ffba33, #ff7b2c);
+  color: #1b1006;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.2s ease-out;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7);
+}
+
+button:hover,
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.85);
+  background: linear-gradient(135deg, #ffd867, #ff9c40);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+}
+
+/* Varianti pulsante secondario (per azioni meno critiche) */
+.btn-secondary {
+  background: rgba(15, 15, 15, 0.9);
+  color: #f7f7f7;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-secondary:hover {
+  background: rgba(30, 30, 30, 0.95);
+}
+
+/* Box output / log */
+pre,
+.output-box {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e6e6e6;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.9rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+/* Badge / info in alto (es. address, balance) */
+.info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 0.78rem;
+  color: #f5f5f5;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+  }
+
+  .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button,
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Componenti per willPage (card, campi, errori) */
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+  border: 1px solid rgba(255, 166, 0, 0.08);
+}
+
+.fields {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Make the public key field wider but not excessive; ensure it fits 0x... (≈42 chars) */
+.card .fields .field:nth-child(2) {
+  flex: 1.4 1 340px;
+  min-width: 42ch;
+  max-width: 520px;
+}
+
+/* Monospace input for hex addresses */
+input.pubkey {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+}
+
+.field label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 6px;
+  text-transform: none;
+}
+
+input[type="text"], input[type="number"] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+  outline: none;
+}
+
+input::placeholder { color: rgba(255,255,255,0.45); }
+
+input:focus {
+  box-shadow: 0 6px 18px rgba(255, 166, 0, 0.08);
+  border-color: rgba(255, 166, 0, 0.6);
+}
+
+.actions { display:flex; align-items:center; gap:8px; }
+
+.remove-btn {
+  background: transparent;
+  color: #ffb3a3;
+  border: 1px solid rgba(255,100,80,0.12);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.remove-btn:hover { 
+  background: transparent;
+  color: #c57869;
+  border: 1px solid rgba(255,100,80,0.12);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transform: translateY(-2px);
+}
+
+.error { color: #ffb3b3; font-size: 0.85rem; margin-top:6px; }
+
+.summary { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; }
+.sum-ok { color: #8ef08e; font-weight:700; }
+.sum-bad { color: #ffb3b3; }
+
+/* Map helper classes used in page */
+.btn.primary { /* keep default gradient */ }
+.btn.ghost { background: rgba(255,255,255,0.04); color: #ffdca8; border-color: rgba(255,255,255,0.06); }
+
+@media (max-width: 768px) {
+  .fields { flex-direction: column; align-items: stretch; }
+  .field { width: 100%; }
+}

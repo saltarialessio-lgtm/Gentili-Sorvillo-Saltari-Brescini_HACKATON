@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Inheritance Panel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Inheritance Controller</h1>
+
+        <div class="btn-row">
+            <button id="addFund">addFund</button>
+            <button id="kill">Kill</button>
+            <button id="checkWallet">checkWallet</button>
+            <button id="will" href="./willPage.html">will</button>
+        </div>
+
+        <pre id="output">Output...</pre>
+
+        <script>
+            async function callApi(path) {
+            document.getElementById("output").textContent = "In esecuzione " + path + "...";
+            try {
+                const res = await fetch("http://127.0.0.1:5000" + path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+                });
+
+                const data = await res.json();
+
+                if(data.stdout != "" && data.stdout != "\n" && data.stdout != undefined){
+                    document.getElementById("output").textContent = data.stdout
+                }
+                else{
+                    document.getElementById("output").textContent = "Failed: " + data.stderr
+                }
+            } catch (e) {
+                document.getElementById("output").textContent = "Errore: " + e.message;
+                console.log(e.message)
+            }
+            }
+
+            document.getElementById("addFund").onclick   = () => callApi("/addFund");
+            document.getElementById("kill").onclick      = () => callApi("/kill");
+            document.getElementById("checkWallet").onclick = () => callApi("/checkWallet");
+            document.getElementById("will").onclick = () => { window.location.href = "/will";}
+        </script>
+    </div>
+</body>
+</html>

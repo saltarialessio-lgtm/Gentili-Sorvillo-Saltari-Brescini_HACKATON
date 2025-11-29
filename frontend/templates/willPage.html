@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Will Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Gestione schede</h1>
+
+    <div id="cards" class="cards-list"></div>
+
+    <div class="summary">
+      <div>
+        Somma percentuali: <span id="percentSum">0</span>% 
+        <span id="sumMsg" class="sum-bad"> (deve essere 100%)</span>
+      </div>
+      <div>
+        <button id="addCard" class="btn ghost">Aggiungi scheda</button>
+        <button id="saveWill" class="btn primary" disabled>Salva Testamento</button>
+      </div>
+    </div>
+
+    <div id="globalError" class="error" aria-live="polite"></div>
+  </div>
+
+  <template id="cardTemplate">
+    <div class="card">
+      <div class="fields">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" class="name" placeholder="Nome beneficiario">
+          <div class="error nameError" style="display:none"></div>
+        </div>
+        <div class="field">
+          <label>Public key (esadecimale)</label>
+          <input type="text" class="pubkey" placeholder="es. 0xa3f5...">
+          <div class="error pubError" style="display:none"></div>
+        </div>
+        <div class="field" style="max-width:120px">
+          <label>Percentuale %</label>
+          <input type="number" class="percent" min="0" max="100" step="0.01" value="0">
+          <div class="error percentError" style="display:none"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="remove-btn" title="Rimuovi scheda">×</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    // Utilità e stato
+    const cardsContainer = document.getElementById('cards');
+    const addCardBtn = document.getElementById('addCard');
+    const saveBtn = document.getElementById('saveWill');
+    const percentSumEl = document.getElementById('percentSum');
+    const sumMsg = document.getElementById('sumMsg');
+    const globalError = document.getElementById('globalError');
+    const tpl = document.getElementById('cardTemplate');
+
+    function createCard() {
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      const percentInput = node.querySelector('.percent');
+      const nameInput = node.querySelector('.name');
+      const pubInput = node.querySelector('.pubkey');
+      const removeBtn = node.querySelector('.remove-btn');
+
+      // Events
+      percentInput.addEventListener('input', () => {
+        validatePercentField(percentInput);
+        updateSumAndState();
+      });
+      nameInput.addEventListener('input', () => { hideError(nameInput); updateSumAndState(); });
+      pubInput.addEventListener('input', () => { hideError(pubInput); });
+
+      removeBtn.addEventListener('click', () => {
+        node.remove();
+        updateSumAndState();
+      });
+
+      return node;
+    }
+
+    function addCard() {
+      const c = createCard();
+      cardsContainer.appendChild(c);
+      // focus first input of new card
+      c.querySelector('.name').focus();
+      updateSumAndState();
+    }
+
+    function getAllCards() {
+      return Array.from(cardsContainer.querySelectorAll('.card'));
+    }
+
+    function parseNumber(v) {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function updateSumAndState() {
+      const cards = getAllCards();
+      let sum = 0;
+      cards.forEach(card => {
+        const p = parseNumber(card.querySelector('.percent').value);
+        sum += p;
+      });
+      sum = Math.round(sum * 100) / 100; // due decimali
+      percentSumEl.textContent = sum;
+      if (sum === 100 && cards.length > 0) {
+        sumMsg.textContent = 'OK';
+        sumMsg.className = 'sum-ok';
+      } else {
+        sumMsg.textContent = ' (deve essere 100%)';
+        sumMsg.className = 'sum-bad';
+      }
+      // abilitare save solo se somma 100 e tutti i campi validi
+      saveBtn.disabled = !(sum === 100 && allFieldsValid());
+      globalError.textContent = '';
+    }
+
+    function validatePercentField(input) {
+      const val = input.value;
+      const errEl = input.parentElement.querySelector('.percentError');
+      const num = parseFloat(val);
+      if (val === '' || !Number.isFinite(num) || num <= 0 || num > 100) {
+        errEl.style.display = 'block';
+        errEl.textContent = 'Inserisci un numero tra 0.1 e 100';
+        return false;
+      } else {
+        errEl.style.display = 'none';
+        return true;
+      }
+    }
+
+    function hideError(input) {
+      const err = input.parentElement.querySelector('.error');
+      if (err) err.style.display = 'none';
+    }
+
+    function validatePubKeyField(input) {
+      const val = input.value.trim();
+      const errEl = input.parentElement.querySelector('.pubError');
+      if (val === '') {
+        errEl.style.display = 'block';
+        errEl.textContent = 'Public key obbligatoria';
+        return false;
+      }
+      errEl.style.display = 'none';
+      return true;
+    }
+
+    function validateNameField(input) {
+      const val = input.value.trim();
+      const errEl = input.parentElement.querySelector('.nameError');
+      if (val === '') {
+        errEl.style.display = 'block';
+        errEl.textContent = 'Nome obbligatorio';
+        return false;
+      }
+      errEl.style.display = 'none';
+      return true;
+    }
+
+    function allFieldsValid() {
+      let ok = true;
+      const cards = getAllCards();
+      if (cards.length === 0) return false;
+      for (const card of cards) {
+        const name = card.querySelector('.name');
+        const pub = card.querySelector('.pubkey');
+        const percent = card.querySelector('.percent');
+        if (!validateNameField(name)) ok = false;
+        if (!validatePubKeyField(pub)) ok = false;
+        if (!validatePercentField(percent)) ok = false;
+      }
+      return ok;
+    }
+
+    addCardBtn.addEventListener('click', () => addCard());
+
+    saveBtn.addEventListener('click', async () => {
+      // ultimo controllo
+      if (!allFieldsValid()) {
+        globalError.style.color = '';
+        globalError.textContent = 'Ci sono errori nei campi. Correggi prima di salvare.';
+        return;
+      }
+      const sum = parseFloat(percentSumEl.textContent);
+      if (sum !== 100) {
+        globalError.style.color = '';
+        globalError.textContent = 'La somma delle percentuali deve essere esattamente 100.';
+        return;
+      }
+
+      // Costruisci payload nello schema richiesto dal contratto
+      const heirs = getAllCards().map(card => {
+        const name = card.querySelector('.name').value.trim();
+        let address = card.querySelector('.pubkey').value.trim();
+        // Normalizza indirizzo esadecimale: aggiungi 0x se mancante
+        if (address && !address.startsWith('0x') && !address.startsWith('0X')) {
+          address = '0x' + address;
+        }
+        // Converti percentuale in "basis points" (es. 60% -> 6000), usando due decimali
+        const percentFloat = parseFloat(card.querySelector('.percent').value) || 0;
+        const percentage = Math.round(percentFloat * 100);
+        return { name, address, percentage };
+      });
+
+      const contractPayload = {
+        contractName: 'Testamento',
+        heirs: heirs,
+        rules: {
+          totalPercentage: 10000
+        }
+      };
+
+      // Invia al server via POST a /deployWill
+      saveBtn.disabled = true;
+      globalError.textContent = '';
+      globalError.style.color = '';
+      try {
+        const resp = await fetch('/deployWill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(contractPayload)
+        });
+        if (!resp.ok) {
+          const txt = await resp.text().catch(() => resp.statusText);
+          globalError.style.color = '';
+          globalError.textContent = `Errore server: ${resp.status} ${txt}`;
+          console.error('Deploy error', resp.status, txt);
+        } else {
+          // prova a leggere JSON se presente
+          let data = null;
+          try { data = await resp.json(); } catch(e) { /* non-JSON */ }
+          globalError.style.color = '#8ef08e';
+          globalError.textContent = 'Testamento inviato con successo.';
+          console.log('Deploy response:', data || 'OK');
+          alert('Testamento inviato con successo.');
+        }
+      } catch (err) {
+        globalError.style.color = '';
+        globalError.textContent = 'Impossibile contattare il server: ' + err.message;
+        console.error(err);
+      } finally {
+        // ripristina stato del pulsante in base alla validità corrente
+        saveBtn.disabled = !(parseFloat(percentSumEl.textContent) === 100 && allFieldsValid());
+      }
+    });
+
+    // inizializza con una scheda
+    addCard();
+  </script>
+</body>
+</html>

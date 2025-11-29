@@ -1,0 +1,18 @@
+{
+  "contractName": "Testamento",
+  "heirs": [
+    {
+      "name": "max",
+      "address": "0xa2C751e99aaAD3CccAd3df7036D74B28bB1E9aAB",
+      "percentage": 2000
+    },
+    {
+      "name": "pippo",
+      "address": "0x59c95829bab1e8F4A055D4dF3960C35f7Cf84355",
+      "percentage": 8000
+    }
+  ],
+  "rules": {
+    "totalPercentage": 10000
+  }
+}
