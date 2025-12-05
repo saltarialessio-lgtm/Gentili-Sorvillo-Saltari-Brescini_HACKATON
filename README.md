@@ -1,38 +1,36 @@
-# 🚀 Hackathlon 2025  
+# 🚀 Hackathon 2025
 ### **Brescini · Gentili · Saltari · Sorvillo**
 
 ---
 
-## 💡 **Idea del Progetto**
+## 💡 **Project Idea**
 
-Il nostro progetto introduce un sistema di **ereditarietà digitale su blockchain**.  
-Oggi, quando una persona fisica possiede criptovalute e viene a mancare, i suoi asset rischiano di andare **perduti per sempre**.
+Our project introduces a **digital inheritance system on blockchain**.
+Today, when an individual owning cryptocurrencies passes away, their assets risk being **lost forever**.
 
-💭 **La nostra soluzione:**  
-Implementiamo un meccanismo che consente di **definire eredi e quote di ripartizione** direttamente on-chain, in modo sicuro, trasparente e automatico.
+💭 **Our solution:**
+We implement a mechanism that allows **defining heirs and distribution shares** directly on-chain, in a secure, transparent, and automatic way.
 
-Il tutto è costruito su una blockchain locale basata su **ETH** grazie all’ambiente di sviluppo fornito da **Avalanche**, che ci ha permesso una configurazione semplice, efficiente e flessibile.
-
----
-
-## 🧠 **Logiche di Sviluppo**
-
-Abbiamo creato una blockchain locale con un utente principale identificato come **root**, dotato di una serie di metodi personalizzati:
-
-### 🔧 **Funzionalità implementate**
-- **`deploy`** → pubblica *on-chain* un nodo vuoto.  
-- **`saveHash`** → salva nel nodo l’hash del testamento (conservato in locale).  
-- **`getWallet`** → restituisce informazioni su balance e hash salvato.  
-- **`kill`** → verifica lo SHA del testamento precedentemente registrato, se corretto distribuisce i fondi agli utenti designati come *eredi*.  
-- **`fundMe`** → ricarica il portafoglio della root.  
-
-Abbiamo inoltre sviluppato un **frontend user-friendly** per semplificare l’interazione con la blockchain senza ricorrere alla CLI.
+Everything is built on a local **ETH**-based blockchain using the development environment provided by **Avalanche**, which allowed for a simple, efficient, and flexible configuration.
 
 ---
 
-## 🛠️ **Tool Utilizzati**
+## 🧠 **Development Logic**
+
+We created a local blockchain with a main user identified as **root**, equipped with a series of custom methods:
+
+### 🔧 **Implemented Features**
+- **`deploy`** → publishes an empty node *on-chain*.
+- **`saveHash`** → saves the will's hash (stored locally) into the node.
+- **`getWallet`** → returns information on balance and saved hash.
+- **`kill`** → verifies the SHA of the previously registered will; if correct, it distributes funds to the users designated as *heirs*.
+- **`fundMe`** → tops up the root wallet.
+
+We also developed a **user-friendly frontend** to simplify interaction with the blockchain without using the CLI.
+
+---
+
+## 🛠️ **Tools Used**
 - **Solidity**
 - **Hardhat**
 - **Avalanche CLI**
-
----
